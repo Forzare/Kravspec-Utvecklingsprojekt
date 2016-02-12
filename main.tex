@@ -1,0 +1,354 @@
+\documentclass{article}
+
+\usepackage{graphicx}
+\usepackage[a4paper]{geometry}
+\graphicspath{{images/}}
+\usepackage[utf8]{inputenc}
+\usepackage{fancyhdr}
+\usepackage[swedish]{babel}
+\usepackage{tabularx}
+\usepackage{multicol}
+\usepackage{tocloft}
+\usepackage[nottoc,numbib]{tocbibind}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+\usepackage{titlesec}
+% För flowcharts
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows}
+% En counter för att numrera kraven
+\newcounter{mycounter}
+% Ett macro för att förenkla en räknare till krav-tabellerna.
+\newcommand{\kcount}[1]{\themycounter{\stepcounter{mycounter}}}
+
+\setlength{\columnsep}{1cm}
+\pagestyle{fancy}
+\setlength{\headheight}{33pt} 
+\fancyhead{}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[LO]{\includegraphics[width=1cm,height=1cm,keepaspectratio]{Smalllogoblack}}
+\fancyhead[RO]{\date{Februari 2016}}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot{}
+\fancyfoot[CO]{\thepage}
+\fancyfoot[LO]{\textit{Utvecklingsprojekt\\LIPS Kravspecifikation}}
+
+\title{\textbf{KRAVSPECIFIKATION}\\
+    \large Utvecklingsprojekt \\
+    Halmstad Högskola VT2016}
+\author{
+Staffan  Nytorpe Piledahl\\
+Markus Axelsson\\
+Anton Häägg\\
+Rickard Hoff}
+\date{Februari 2016}
+
+\begin{document}
+\setcounter{mycounter}{1}
+
+\maketitle
+\thispagestyle{empty}
+\newpage
+\begin{center}
+\chapter{\textbf{\LARGE PROJEKTIDENTITET}}
+\end{center}
+\vspace{30mm}
+\begin{center}
+\begin{tabularx}{\textwidth}{| X | X | X |} 
+ \hline
+ \textbf{Namn} & \textbf{Ansvar} & \textbf{E-post} \\ 
+ \hline
+ Staffan Nytorpe Piledahl & Konstruktion & stanyt13@student.hh.se\\ 
+ Markus Axelsson & Mjukvara & markax13@student.hh.se\\
+ Anton Häägg & Mjukvara & anthaa12@student.hh.se\\
+ Rickard Hoff & Elektronik & richof13@student.hh.se\\
+ \hline
+\end{tabularx}
+
+\end{center}
+  \begin{tabular}{@{}ll@{}}
+    \vspace{2mm}
+    \textbf{Kund:} & FortNight AB\\
+    \textbf{Kontaktpersoner hos kund:} & Kristoffer Bengtsson - kristoffer@fortnight.se\\
+    \vspace{2mm}
+    & Tobias Järvås - tobias@fortnight.se\\
+    \vspace{2mm}
+    \textbf{Kursansvarig:} & Nicolina Månsson - nicolina.mansson@hh.se\\
+    \textbf{Handledare:} & Hans-Erik Eldemark
+  \end{tabular}
+
+\newpage
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\tableofcontents
+\newpage
+\begin{multicols*}{2}
+\section{Inledning}
+Fortnight AB har utvecklat ett passagesystem som de har döpt till Hillocks. Det består av en kapacitiv knappsats innehållande all hårdvara nödvändig för att öppna en dörr utrustad med ett elslutbleck. Dörren öppnas med tidsbegränsade koder antingen direkt på knappsatsen alternativt via en smartphone. Det som önskas av oss är att dela upp hårdvaran i två enheter, en knappsats och en accesspunkt.
+
+\subsection{Parter}
+Fortnight AB är beställare av projektet, där Kristoffer Bengtsson och Tobias Järvås är kontaktpersoner. Hans-Erik är handledare för projektet, och det utförs av fyra studenter från Halmstad Högskola. En Mekatronik-, en elektronik- och två dataingenjörer.
+
+\subsection{Syfte och Mål}
+Målet med projektet är att kunna överföra så mycket hårdvara som möjligt från beställarens knappsats in i en accesspunkt som skall montera innanför dörren. Syftet med detta är för att beställaren vill kunna öka skyddsklassen på sin produkt. I nuläget är det relativt enkelt att via sabotage kunna få reläet i knappsatsen att öppna dörren. Detta är en fullgod lösning som skalskydd där eventuella värdesaker befinner sig bakom ytterligare en låst dörr. Skall produkten kunna säljas till företag och lokaler där det yttre skalskyddet är det primära skyddet så måste säkerhetsklassen ökas.
+
+\subsection{Användning}
+Nedan följer några användarscenario beskriver hur slutprodukten är tänkt att integrera med slutanvändaren. Nedan följer ett användarscenario hur en hyresgäst låser upp fastighetsdörren till ett bostadshus. Notera att den tekniska lösningen som vänder sig direkt mot slutanvändaren för att låsa upp dörren inte är något som denna grupp kommer att vara direkt involverad i.
+
+\paragraph{Användarscenario för upplåsning av dörr:} 
+\begin{enumerate}
+    \item Hyresgästen närmar sig fastighetsdörren och plockar upp sin telefon. Telefonen känner av att den är nära dörren och föreslår öppning av Hillocks Smartphone App.
+    \item Hyresgästen öppnar appen och ser dagens kod.
+    \item Hyresgästen trycker in första siffran i koden, en liten lätt vibration indikerar indikerar att systemet har tagit emot knapptrycket.
+    \item Processen upprepas för de följande tre siffrorna. LED-lampan på knappen skiftar från vitt ljus till grön för att signalera att dörren är upplåst. 
+    \item Hyresgästen öppnar dörren, går in och dörren stängs. Lampan skiftar nu från grönt ljus till vitt för att signalera att knappsatsen är igång.
+\end{enumerate}
+\paragraph{Teknisk lösning 1:} 
+\begin{enumerate}
+    \item När hyresgästen trycker på första siffran i koden registreras knapptrycket via en kapacitiv kopparplatta.
+    \item Signalen skickas till en 10-to-4-line encoder.
+    \item Knapptrycket översätts till ett 4-bitas värde som skickas via fyra kablar till en Arduino Blend Micro.
+    \item Värdet vidarebefordras till Arduinon som registrerar vilken siffra som blivit tryckt på.
+    \item Processen upprepas för varje knapptryckning.
+    \item När rätt sekvens siffror har tryckts in aktiveras ett relä som öppnar dörren.
+
+\end{enumerate} 
+
+\subsection{Bakgrundsinformation}
+ 
+Flest inbrott sker i lägenheter. DN (2015)\cite{dn_inbrott} skriver att inbrotten ökar i villa och radhus men att inbrott fortfarande överlägset sker i lägenheter. Vidare menar Hemhyra (2011)\cite{hemhyra_inbrott} att det krävs elektroniska portlås för att minska brottsligheten. Många av de säkerhetsdörrar som finns idag är inte tillräckliga för att hålla inbrottstjuvarna borta och därför krävs ordentliga portlås.
+
+Fortnight AB har en utvecklad produkt tillgänglig på marknaden. De arbetar redan mot fastighetsföretag men produkten påvisar ännu inte tillräckligt hög säkerhet för att säljas vidare. Således krävs en utveckling av passagesystemet för att företaget ska ha möjlighet att växa. 
+
+\subsection{Definitioner}
+\begin{description}
+    \item[Knappsats:] Produkten som skall sitta monterad intill dörr. Produkten existerar redan idag men vi skall flytta ut största möjliga mängd komponenter från den.
+    \item[Relämodul:] Den enhet som monteras intill ett elslutbleck.
+    \item[Accesspunkt:] Refererar till den produkt vi skall hantera systemets koppling till Internet.Skall monteras innanför entrén till byggnaden.
+\end{description}
+
+\newpage
+\section{Översikt av systemet}
+Nedan presenteras en översikt av systemet. En beskrivning av produkten presenteras och produktkomponenter redogörs för.
+
+\subsection{Grov beskrivning av produkten}
+Användaren knappar in sin kod på knappsatsen, signalerna från knapparna skall skickas via en 10-to-4 line encoder som översätter dem till en 4 bitars signal som via en Arduino skickar dessa vidare till en Raspberry Pi. Denna kontrollerar sedan koden mot dagens kod och om den är korrekt, aktiverar ett relä som låser upp dörren via ett elslutbleck.
+
+\subsection{Produktkomponenter}
+Systemet består av:
+\begin{itemize}
+    \item 1 knappsats
+    \item 1 RFID-läsare
+    \item 1 Arduino med inbyggd bluetooth.
+    \item 1 relä/relämodul
+    \item 1 LED-lampa
+    
+\end{itemize}
+
+\subsection{Beroende till andra system}
+\begin{itemize}
+    \item Systemet vi bygger kommer att vara beroende av en stabil likspänning, 12V/24V.
+    \item Systemet med accesspunkt är beroende av en fungerade koppling till Internet.
+\end{itemize}
+
+\subsection{Ingående delsystem}
+\begin{itemize}
+    \item Knappsats
+    \item Reläenhet
+    \item Accesspunkt
+\end{itemize}
+
+\subsection{Avgränsningar}
+ Avgränsningar är att produkten antas användas i normala svenska väderförhållanden och att den spänning som väljs att designa för kommer finnas tillgänglig. De flesta s.k. edge-cases, specialfall, kommer bortses från i utvecklingen av denna protoyp. Ett antagande görs att produkten används till det den är avsedd för. 
+
+Det är rimligt att anta att företaget vill arbeta så kostnadseffektivt som möjligt, därav är det inte möjligt för oss att använda metoder och utrustning som faller utanför den budget som är avsatt. 
+
+\subsection{Designfilosofi}
+\begin{itemize}
+    \item Installationen är tänkt att kunna utföras av lekman och ska således vara så okomplicerad som möjligt.
+    \item Kostnadseffektiv lösning i jämförelse med dagens system.
+    \item Mjukvaran är tänkt att skrivas i Python och C med hjälp av Arduino's api.
+    \item Miljön systemet skall användas i förutsätts vara i samma nivå som nuvarande.
+\end{itemize}
+
+\subsection{Generella krav på hela systemet}
+
+\begin{tabularx}{\columnwidth}{|l|X|l|}
+\hline
+    % Detta är kanske ett för högt ställda krav. Är det inte ganska troligt att en viss handpåläggning kommer
+    % att krävas för att enheterna skall anslutas till varandra? Vi har ju egentligen inte gått igenom några direkta krav.
+    % Här skall man som jag förstår det skriva skall-krav. Dessa krav måste gå att mäte för att kunna bekräfta att de har 
+    % blivit uppfyllda.
+    Krav \kcount & Styrning av elslutbleck skall genomföras inifrån. & Original \\
+    \hline
+    Krav \kcount & Anslutning mellan knappsats och relämodul skall vara trådbunden. & Original\\
+    \hline
+    Krav \kcount & Elslutbläck skall kunna öppnas med kod, BLE-kompatibel mobiltelefon och med RFID tag. & Original\\
+    \hline
+    Krav \kcount & Installation skall vara möjlig utan krav på behörig fackman. & Original\\
+    \hline
+    Krav \kcount & Systemet skall fungera utan internet uppkoppling & Original\\
+    \hline
+\end{tabularx}
+
+\newpage
+
+\section{Delsystem 1: Knappsats}
+% UML diagram
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=red!30]
+\tikzstyle{knappsats} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=blue!30]
+\tikzstyle{val} = [diamond, minimum width=4cm, minimum height=1cm, text centered, draw=black, fill=green!30]
+\tikzstyle{relamodul} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=yellow!30]
+\tikzstyle{accesspunkt} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=yellow!30]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+\tikzstyle{empty} = [rectangle, minimum width=3 cm, minimum height=1cm, draw=black, fill=white]
+
+\begin{tikzpicture}[node distance=2cm]
+    \node (start) [startstop] {Start};
+    \node (knappsats1) [knappsats, below of=start] {Knappsats};
+    \node (relamodul1) [relamodul, below of=knappsats1] {Relämodul};
+    \coordinate[below of=relamodul1] (stop);
+
+    \draw [arrow] (start) -- node[anchor=east] {\textit{Kod / RFID}} (knappsats1);
+    \draw [arrow] (knappsats1) -- (relamodul1);
+    \draw [arrow] (relamodul1) -- node[anchor=east] {} (stop);
+\end{tikzpicture}
+% UML diagram slut
+
+\subsection{Inledande beskrivning av delsystem 1}
+Knappsatsen består av ett chassi av aluminium där sidan vänd mot användaren är en 3mm tjock plastskiva med tryckta siffror på. Knappsatsen har inga traditionella återfjädrande knappar utan under siffrorna sitter det kapacitiva givare som känner av om ett bart/naket finger trycker på ytan. 
+
+Inuti knappsatsen sitter det ett kort innehållande två chip som stryr de 10 stycken kapacitiva givarna, en 10-to-4-line encoder, en RFID-läsare och en Neopixel LED som styrs med pwm. 
+
+När användaren trycker på en av siffrorna känns detta av de kapacitiva givarna som skickar en signal på respektive utgång till en encoder. Denna i sin tur vidarebefordrar en fyra bitars kod till ett Arduino chip som avkodar signalen enligt en sanningstabell för att ta reda på vilken av siffrorna som trycktes på.
+
+\subsection{Gränssnitt}
+\begin{tabularx}{\columnwidth}{|l|X|l|}
+\hline
+    Krav \kcount & Användaren skall kunna använda sifferkod för att öppna dörren & Original\\
+    \hline
+    Krav \kcount & Användaren skall kunna använda RFID för att öppna dörren & Original\\
+    \hline
+    Krav \kcount & Knappsatsen skall innehålla en LED-lampa & Original\\
+\hline
+\end{tabularx}
+
+\subsection{Designkrav}
+\begin{tabularx}{\columnwidth}{|l|X|l|}
+\hline
+Krav \kcount & Knappsatsens dimensioner får inte öka, enbart minska. & Original\\
+\hline
+\end{tabularx}
+
+\subsection{Funktionella krav}
+\begin{tabularx}{\columnwidth}{|l|X|l|}
+\hline
+Krav \kcount & Systemet skall ha en övre gräns på hur många felaktiga försök som fås göras innan systemet sätter sig i dvala under en begränsad tid. & Original\\
+\hline
+\end{tabularx}
+
+\newpage
+\section{Delsystem 2: Relämodul}
+
+% UML diagram
+\tikzstyle{arduino} = [rectangle, minimum width=3cm, minimum height=1cm, text centered, draw=black, fill=yellow!30]
+\tikzstyle{rela} = [rectangle, minimum width=2cm, text width=2cm, minimum height=1cm, text centered, draw=black, fill=blue!30]
+\tikzstyle{rgb} = [rectangle, minimum width=3cm, text width=3cm, minimum height=1cm, text centered, draw=black, fill=white!30]
+\tikzstyle{telefon} = [rectangle, minimum width=2cm, text width=2cm, minimum height=1cm, text centered, draw=black, fill=black!30]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+
+
+\begin{tikzpicture}[node distance=3cm]
+    \node (arduino) [arduino,] {Arduino med BT};
+    \coordinate[above of=arduino] (start);
+    \node (rela) [rela, below of=arduino, xshift=2cm] {Relä};
+    \node (telefon) [telefon, below of=arduino, xshift=-1 cm] {Telefon};
+    \node (rgb) [rgb, right of=arduino, yshift=2.7 cm] {RGB LED \textit{Tillhör Delsystem 1}};
+    \draw [arrow] (start) -- node[anchor=east] {\textit{Delsystem 1}} (arduino);
+    \draw [arrow] (arduino) -- (rela);
+    \draw [arrow] (arduino) -- (rgb);
+    \draw[>=latex,->] ([xshift= 5pt] arduino.south) -- ([xshift= 5pt] telefon.north);
+    \draw[>=latex,<-] ([xshift=-5pt] arduino.south) -- ([xshift=-5pt] telefon.north);
+
+
+\end{tikzpicture}
+% UML diagram slut
+
+\subsection{Inledande beskrivning}
+Relämodulen kommer sitta i närheten av elslutbläcket och fungera som mottagare för bluetooth signaler samt elektriska signaler från knappsatsen. Denna kommer sedana avgöra om dörren skall öppnas eller inte samt verkställa detta. 
+
+\subsection{Gränssnitt}
+Inputs:
+- Rfid läsaren levererar information om taggen över SPI
+- Knappsats levererar BCD encodat värde via 4 ledare
+- Bluetooth knapptryck tas emot från telefon
+- 12/24v Spänning in
+Ouput:
+- PWM signal till LED i knappsats
+- Telefon blir notifyad om att den kan öppna dörren när den närmat sig
+- Reläet styrs av en 5v signal som ges från 3.3 til transistor
+
+
+\subsection{Designkrav}
+\begin{tabularx}{\columnwidth}{|l|X|l|}
+\hline
+Krav \kcount & Modulen skall vara liten nog för att kunna installeras i väggen bakom ett elslutbleck & Original\\
+\hline
+Krav \kcount & Elslutbläcket styrs via tråd från relä (förberett för fyra stycken elslutbläck styrningar) & Original\\
+\hline
+Krav \kcount & Ibeacon (upptäckande av mobil) funktionaliteten sköts från relämodulen & Original\\
+\hline
+\end{tabularx}
+
+\subsection{Funktionella krav}
+\begin{tabularx}{\columnwidth}{|l|X|l|}
+\hline
+Krav \kcount &  & Original\\
+\hline
+\end{tabularx}
+
+\newpage
+\section{Prestandakrav}
+\begin{tabularx}{\columnwidth}{|l|X|l|}
+\hline
+Krav \kcount & Dörröppning skall ske inom nuvarande tidsramar. & Original\\
+\hline
+
+\end{tabularx}
+
+\section{Tillförlitlighet}
+\begin{tabularx}{\columnwidth}{|l|X|l|}
+    \hline
+    Krav \kcount & Produkten skall uppfylla alla punkter i testspecifikationen. & Original\\
+\hline
+\end{tabularx}
+
+\section{Ekonomi}
+\begin{tabularx}{\columnwidth}{|l|X|l|}
+    \hline
+    Krav \kcount & Budgeten på 5000 SEK för materialkostnader under utvecklingen. & Original\\
+\hline
+\end{tabularx}
+
+\section{Krav på säkerhet}
+\begin{tabularx}{\columnwidth}{|l|X|l|}
+    \hline
+    Krav \kcount & Produkten får inte skapa dold fara vid installation. & Original\\
+\hline
+\end{tabularx}
+
+\end{multicols*}
+
+\newpage
+\begin{thebibliography}{1}
+
+\bibitem{lipsbok}
+1. Svensson T, Krysander C. \emph{Projektmodellen LIPS.} Lund: Studentlitteratur; 2011.
+
+\bibitem{hemhyra_inbrott} Hemhyra: åtta av 10 inbrott\\
+\url{http://www.hemhyra.se/stockholm/ny-rapport-atta-av-tio-inbrott-i-lagenheter-med-tradorr}
+\\\date{2016-02-05}
+
+\bibitem{dn_inbrott}Dagens Nyheter: Så ökar bostadsinbrotten i stockholm\\\texttt{http://www.dn.se/sthlm/sa-okar-bostadsinbrotten-i-stockholm/}, \date{2016-02-05}
+
+\end{thebibliography}
+\end{document}
